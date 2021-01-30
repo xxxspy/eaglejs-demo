@@ -6,12 +6,16 @@ import Home from './Home'
 import Eagle, { Options } from 'eagle.js'
 import 'eagle.js/dist/eagle.css'
 import hljs from 'highlight.js'
-
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import slideshows from './slideshows/slideshows.js'
 /* eslint-disable no-new */
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.use(Eagle)
 Vue.use(Router)
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
 Vue.config.productionTip = false
 Options.hljs = hljs
 
