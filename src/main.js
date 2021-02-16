@@ -11,7 +11,12 @@ import slideshows from './slideshows/slideshows.js'
 /* eslint-disable no-new */
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import './styles.css'
+import VueAnime from 'vue-animejs';
+import VueMathjax from 'vue-mathjax'
 
+Vue.use(VueMathjax)
+Vue.use(VueAnime)
 Vue.use(Eagle)
 Vue.use(Router)
 Vue.use(BootstrapVue)

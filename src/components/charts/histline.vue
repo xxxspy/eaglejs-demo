@@ -1,10 +1,4 @@
-<template>
-    <div class="chart__wrapper">
-        <div v-if="title" class="chart__title">{{title}}</div>
-        <div ref="chart" :style="{ height: `${this.height}px` }"></div>
-        <div v-if="source" class="chart__source">{{source}}</div>
-    </div>
-</template>
+
 
 <script>
 import D3Chart from './base'
@@ -31,22 +25,14 @@ export default {
             let width = this.width;
             console.log({height, width})
             let numBins = this.numBins;
-            let m = {top: 50, right: 50, bottom: 50, left: 50}
+            let m = {top: 20, right: 20, bottom: 20, left: 20}
             , h = height - m.top - m.bottom
-            , w = width - m.left - m.right
-            , n = 10000;
+            , w = width - m.left - m.right;
 
             var norm = this.datum;
-            console.log({min: d3.min(norm), max: d3.max(norm)})
-            var x = d3.scaleLinear().domain([d3.min(norm), d3.max(norm)]).range([0, w]);
-            console.log(x.domain())
-            console.log(x.range())
-            console.log('----------------')
+            let margin = 0.2*(d3.max(norm)-d3.min(norm))
+            var x = d3.scaleLinear().domain([d3.min(norm)-margin, d3.max(norm)+margin]).range([0, w]);
             var data = d3.bin().thresholds(numBins)(norm)
-            console.log({norm})
-            console.log(x.ticks(numBins))
-            console.log({data})
-            console.log(data.map(d=>d.length))
             //Axes and scales
             var yhist = d3.scaleLinear()
                             .domain([0, d3.max(data, function(d) { return d.length; })])
@@ -56,6 +42,7 @@ export default {
 
             var xAxis = d3.axisBottom()
                         .scale(x)
+                        .ticks(numBins+1)
 
             var yAxis = d3.axisLeft()
                         .scale(yhist)
@@ -72,13 +59,19 @@ export default {
                 .data(data)
                 .enter()
                 .append('rect')
-                .attr('x', 1)
-                .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + yhist(d.length) + ")"; })
+                .attr("x", d=>{return x(d.x0)+m.left})
+                // .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + yhist(d.length) + ")"; })
                 .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
-                .attr("height", function(d) { return height - yhist(d.length) - m.top - m.bottom; })
-                // .attr('stroke', '#69b3a2')
+                // .attr("height", function(d) { return height - yhist(d.length) - m.top - m.bottom; })
                 .attr('fill', '#00000000')
                 .attr('class', 'datasense-shape')
+                .attr('y', height-m.top-m.bottom)
+            bars.data(data)
+                .transition()
+                .duration(1000)
+                .attr("height", function(d) { return h - yhist(d.length); })
+                .attr("y", d=>{return yhist(d.length)+m.top})
+                .delay((d, i)=>{console.log({i,});return i*100})
 
             //Draw CDF line
             var guide = d3.line()
@@ -94,10 +87,11 @@ export default {
             //Draw axes
             svg.append("g")
                 .attr("class", "x axis")
-                .attr("transform", "translate(0," + h + ")")
+                .attr("transform", `translate(${m.left}, ${h+m.top})`)
                 .call(xAxis);
 
             svg.append("g")
+                .attr('transform', `translate(${m.left}, ${m.top})`)
                 .attr("class", "y axis")
                 .call(yAxis)
                 .append("text")
@@ -107,16 +101,6 @@ export default {
                 .style("text-anchor", "end")
                 .text("Count (Histogram)");
 
-            // svg.append("g")
-            //     .attr("class", "y axis")
-            //     .attr("transform", "translate(" + [w, 0] + ")")
-            //     .call(yAxis2)
-            //     .append("text")
-            //     .attr("transform", "rotate(-90)")
-            //     .attr("y", 4)
-            //     .attr("dy", "-.71em")
-            //     .style("text-anchor", "end")
-            //     .text("CDF");
         }
     },
 }

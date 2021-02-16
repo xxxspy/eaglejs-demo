@@ -1,9 +1,5 @@
 <template>
-  <div class="chart__wrapper">
-    <div v-if="title" class="chart__title">{{title}}</div>
-    <div ref="chart" :style="{ height: `${this.height}px` }"></div>
-    <div v-if="source" class="chart__source">{{source}}</div>
-  </div>
+    <svg class="slide-ele" :style="{left:position.left, top: position.top}" :width="width" :height="height" ref="chart"></svg>
 </template>
 
 <script>
@@ -34,9 +30,10 @@ export default {
             required: false,
             default: ()=>({ top: 10, right: 30, bottom: 20, left: 40 }),
         },
-        title: {
-            type: String,
-            default: '',
+        position: {
+            type: Object,
+            required: false,
+            default: ()=>({left: 10, top: 10})
         },
         source: {
             type: String,
@@ -44,11 +41,11 @@ export default {
         },
         height: {
             type: [Number, String],
-            default: 500,
+            default: 300,
         },
         width: {
             type: [Number, String],
-            default: 960,
+            default: 500,
         }
     },
 
@@ -80,36 +77,19 @@ export default {
         },
 
         initChartFrame(){
-            let classname = this.name;
-            // Wrapper div
-            this.wrap = this.selection.append('div') 
-                .attr("class", "chart__wrap chart__wrap--"+classname);
-
             // SVG element
-            this.svg = this.wrap.append('svg')
-                .attr("class", "chart chart--"+classname)
-                .style('width', this.width)
-                .style('height', this.height)
-
-            // General group for margin convention
-            this.g = this.svg.append("g")
-                .attr("class", "chart__margin-wrap chart__margin-wrap--"+classname)
-                .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
-
-            // Tooltip
-            this.selection.selectAll('.chart__tooltip').remove()
-            this.tooltip = this.wrap
-                .append('div')
-                .attr('class', "chart__tooltip chart__tooltip--"+classname);
+            this.svg = d3.select(this.$refs.chart);
+            this.svg.attr('class', this.svg.attr('class')+' '+this.name)
         },
 
         initChart(){
 
+        },
+
+        destroyChart(){
+            this.svg.attr('class', 'animate__fadeOutDownBig')
+            // this.svg.selectAll('*').remove()
         }
     },
 };
 </script>
-
-<style lang="scss">
-@import './styles';
-</style>
